@@ -1,0 +1,206 @@
+#clearview-root {
+  margin: 0;
+  padding: 0;
+  border: none;
+  pointer-events: none;
+}
+
+#clearview-root * {
+  box-sizing: border-box;
+}
+
+.clearview-lens {
+  position: fixed;
+  left: 0;
+  top: 0;
+  margin: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2147483646;
+  border: 3px solid rgba(59, 130, 246, 0.9);
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.85),
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    inset 0 0 30px rgba(0, 0, 0, 0.08);
+  background: #111;
+  will-change: left, top;
+}
+
+.clearview-shape-circle {
+  border-radius: 50%;
+}
+
+.clearview-shape-rect {
+  border-radius: 12px;
+}
+
+#clearview-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.clearview-crosshair-h,
+.clearview-crosshair-v {
+  position: absolute;
+  background: rgba(239, 68, 68, 0.55);
+  pointer-events: none;
+}
+
+.clearview-crosshair-h {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.clearview-crosshair-v {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
+.clearview-reading-line {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 50%;
+  height: 28%;
+  transform: translateY(-50%);
+  border-top: 2px solid rgba(250, 204, 21, 0.7);
+  border-bottom: 2px solid rgba(250, 204, 21, 0.7);
+  background: rgba(250, 204, 21, 0.08);
+  pointer-events: none;
+}
+
+.clearview-lens-ring {
+  position: absolute;
+  inset: -4px;
+  border: 1px dashed rgba(255, 255, 255, 0.35);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.clearview-hud {
+  position: fixed;
+  z-index: 2147483646;
+  padding: 6px 12px;
+  background: rgba(15, 23, 42, 0.88);
+  color: #e2e8f0;
+  font-size: 11px;
+  font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+  pointer-events: none;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.clearview-translate {
+  position: fixed;
+  z-index: 2147483646;
+  display: none;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.97);
+  color: #0f172a;
+  font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  pointer-events: none;
+  line-height: 1.55;
+}
+
+.clearview-translate-label {
+  font-size: 10px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.clearview-translate-result {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1d4ed8;
+  margin-bottom: 8px;
+}
+
+.clearview-translate-original {
+  font-size: 13px;
+  color: #334155;
+}
+
+.clearview-translate-loading {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+.clearview-translate-error {
+  font-size: 12px;
+  color: #dc2626;
+  margin-top: 4px;
+}
+
+.clearview-color {
+  position: fixed;
+  z-index: 2147483646;
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #f8fafc;
+  font-size: 11px;
+  font-family: Consolas, monospace;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.clearview-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.clearview-link {
+  position: fixed;
+  z-index: 2147483646;
+  display: none;
+  max-width: 360px;
+  padding: 6px 10px;
+  background: rgba(30, 41, 59, 0.92);
+  color: #93c5fd;
+  font-size: 11px;
+  font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+  border-radius: 6px;
+  word-break: break-all;
+  pointer-events: none;
+}
+
+.clearview-toast {
+  position: fixed;
+  z-index: 2147483647;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  padding: 10px 18px;
+  background: rgba(15, 23, 42, 0.92);
+  color: #f1f5f9;
+  font-size: 13px;
+  font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.25s, transform 0.25s;
+  pointer-events: none;
+}
+
+.clearview-toast-show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

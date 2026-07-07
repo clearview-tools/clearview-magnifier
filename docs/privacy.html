@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClearView Magnifier 隐私政策</title>
+  <meta name="description" content="ClearView Magnifier（阅屏助手）Chrome 扩展隐私政策">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --border: #e2e8f0;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f172a;
+        --card: #1e293b;
+        --text: #f1f5f9;
+        --muted: #94a3b8;
+        --border: #334155;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 40px 20px 64px;
+    }
+    header {
+      margin-bottom: 32px;
+    }
+    h1 {
+      font-size: 1.75rem;
+      margin: 0 0 8px;
+    }
+    .meta {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    h2 {
+      font-size: 1.15rem;
+      margin: 0 0 12px;
+      color: var(--accent);
+    }
+    p, li { margin: 0 0 10px; }
+    ul { padding-left: 1.25rem; margin: 0; }
+    a { color: var(--accent); }
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.875rem;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>ClearView Magnifier 隐私政策</h1>
+      <p class="meta">阅屏助手 Chrome 扩展 · 生效日期：2026-07-07 · 版本 1.0.4</p>
+    </header>
+
+    <section>
+      <h2>概述</h2>
+      <p>
+        ClearView Magnifier（以下简称「本扩展」）是一款浏览器辅助工具，提供屏幕放大镜、阅读辅助与可选的实时翻译功能。
+        我们重视您的隐私。本政策说明本扩展收集、使用与存储哪些信息。
+      </p>
+    </section>
+
+    <section>
+      <h2>我们收集哪些数据</h2>
+      <ul>
+        <li><strong>扩展设置</strong> — 放大倍数、透镜大小、语言偏好、功能开关等，保存在浏览器 <code>chrome.storage.sync</code> 中，可随 Google 账号同步。</li>
+        <li><strong>翻译文本（可选）</strong> — 仅在您开启「实时翻译」时，将放大镜指向位置附近的文字片段（最多约 500 字符）发送至第三方翻译服务。</li>
+        <li><strong>当前标签页截图（本地）</strong> — 为显示放大效果，扩展会截取当前可见标签页画面，仅在您的浏览器本地 Canvas 中处理，<strong>不会上传至我们的服务器</strong>。</li>
+      </ul>
+      <p>本扩展<strong>不</strong>收集姓名、邮箱、支付信息，也不建立用户账号。</p>
+    </section>
+
+    <section>
+      <h2>数据如何使用</h2>
+      <ul>
+        <li>设置数据用于记住您的偏好。</li>
+        <li>截图数据仅用于在页面上渲染放大镜效果。</li>
+        <li>翻译文本仅用于返回译文并显示在页面上；扩展内置缓存（约 5 分钟）以减少重复请求。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>第三方服务</h2>
+      <p>开启翻译功能时，文本可能发送至以下公共服务（按优先级自动切换）：</p>
+      <ul>
+        <li><a href="https://mymemory.translated.net/" target="_blank" rel="noopener">MyMemory Translated</a></li>
+        <li>Google Translate（非官方接口）</li>
+        <li><a href="https://lingva.ml/" target="_blank" rel="noopener">Lingva Translate</a></li>
+      </ul>
+      <p>这些第三方服务有其独立的隐私政策与数据处理方式，请参阅相应网站。我们不对第三方服务的行为负责。</p>
+    </section>
+
+    <section>
+      <h2>权限说明</h2>
+      <ul>
+        <li><strong>activeTab</strong> — 在当前标签页截图与注入放大镜界面。</li>
+        <li><strong>storage</strong> — 保存您的扩展设置。</li>
+        <li><strong>scripting</strong> — 扩展更新后向已打开页面重新注入脚本。</li>
+        <li><strong>host_permissions (&lt;all_urls&gt;)</strong> — 在任意网页上运行放大镜；访问上述翻译 API。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>数据存储与保留</h2>
+      <ul>
+        <li>设置：保留至您卸载扩展或清除浏览器扩展数据。</li>
+        <li>翻译缓存：约 5 分钟后过期，最多缓存约 200 条，存于扩展后台内存中。</li>
+        <li>截图：不持久存储，仅临时用于当前显示。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>数据共享</h2>
+      <p>
+        我们不会出售您的数据。除上述第三方翻译 API（仅在您启用翻译时）外，
+        我们不会与广告商或数据分析公司共享您的信息。
+      </p>
+    </section>
+
+    <section>
+      <h2>儿童隐私</h2>
+      <p>本扩展不面向 13 岁以下儿童，也不会故意收集儿童个人信息。</p>
+    </section>
+
+    <section>
+      <h2>政策变更</h2>
+      <p>
+        我们可能更新本政策。重大变更时，将在本页面更新「生效日期」。
+        继续使用本扩展即表示您接受更新后的政策。
+      </p>
+    </section>
+
+    <section>
+      <h2>联系我们</h2>
+      <p>
+        如有隐私相关问题，请通过
+        <a href="https://github.com/caixinyu/clearview-magnifier/issues" target="_blank" rel="noopener">GitHub Issues</a>
+        联系开发者。
+      </p>
+    </section>
+
+    <footer>
+      <p>ClearView Magnifier · Privacy Policy</p>
+    </footer>
+  </div>
+</body>
+</html>
