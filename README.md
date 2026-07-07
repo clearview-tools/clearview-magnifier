@@ -34,6 +34,13 @@
 
 详细步骤见 [docs/README.md](docs/README.md)。
 
+本地已初始化 Git 仓库。首次发布请在项目目录执行：
+
+```powershell
+gh auth login
+.\scripts\publish-github.ps1
+```
+
 ## 快速上手
 
 1. 在任意网页上按住 **Alt + 右键** 启动放大镜
