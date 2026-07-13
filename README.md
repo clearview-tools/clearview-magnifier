@@ -4,6 +4,9 @@
 
 当前版本：**1.1.1**
 
+开源仓库：[github.com/clearview-tools/clearview-magnifier](https://github.com/clearview-tools/clearview-magnifier)  
+隐私政策：[clearview-tools.github.io/clearview-magnifier/privacy.html](https://clearview-tools.github.io/clearview-magnifier/privacy.html)
+
 ## 免费版 vs Pro
 
 | 功能 | 免费版 | Pro |

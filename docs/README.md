@@ -10,17 +10,19 @@ Chrome 网上应用店要求填写**可公开访问的隐私政策 URL**。
 2. **Settings → Pages** → 分支 `main`，目录 **`/docs`**
 3. 隐私政策 URL：
 
-```
-https://<组织名>.github.io/clearview-magnifier/privacy.html
-```
-
-4. License 白名单（可选）：将 `licenses.json` 放在 `docs/` 一并发布：
+部署 `docs/` 后，隐私政策地址：
 
 ```
-https://<组织名>.github.io/clearview-magnifier/licenses.json
+https://clearview-tools.github.io/clearview-magnifier/privacy.html
 ```
 
-5. 填入 `background/site-config.js` 的 `privacyUrl`、`licensesUrl`、`supportUrl`
+License 白名单：
+
+```
+https://clearview-tools.github.io/clearview-magnifier/licenses.json
+```
+
+链接已写入 `background/site-config.js`。
 
 对外显示组织品牌，不出现个人用户名。
 

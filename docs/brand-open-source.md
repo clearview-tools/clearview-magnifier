@@ -45,12 +45,11 @@
 - Visibility：**Public**（开源）
 - 不要勾选把个人仓库 Transfer（若已有个人仓，也可后面 Transfer）
 
-本地推送（把 `YOUR-ORG` 换成组织名）：
+本地推送（组织 **clearview-tools**）：
 
 ```bash
 cd e:\pythonproject\clearview-magnifier
-git remote remove origin   # 若之前指向个人账号
-git remote add origin https://github.com/YOUR-ORG/clearview-magnifier.git
+git remote set-url origin https://github.com/clearview-tools/clearview-magnifier.git
 git push -u origin main
 ```
 
@@ -69,30 +68,25 @@ git push -u origin main
 约 1～2 分钟后可访问：
 
 ```
-https://YOUR-ORG.github.io/clearview-magnifier/privacy.html
+https://clearview-tools.github.io/clearview-magnifier/privacy.html
 ```
 
 ---
 
-## 第四步：配置项目链接
+## 第四步：项目链接（已配置）
 
-编辑 `background/site-config.js`（把 `YOUR-ORG` 换成组织名）：
+`background/site-config.js` 已写入组织地址；`purchaseUrl` 在 Gumroad 等商品页就绪后再填。
 
 ```javascript
 const SITE_CONFIG = {
-  privacyUrl: 'https://YOUR-ORG.github.io/clearview-magnifier/privacy.html',
-  purchaseUrl: 'https://你的商品页.gumroad.com/l/...',
-  supportUrl: 'https://github.com/YOUR-ORG/clearview-magnifier/issues',
-  licensesUrl: 'https://YOUR-ORG.github.io/clearview-magnifier/licenses.json'
+  privacyUrl: 'https://clearview-tools.github.io/clearview-magnifier/privacy.html',
+  purchaseUrl: '',
+  supportUrl: 'https://github.com/clearview-tools/clearview-magnifier/issues',
+  licensesUrl: 'https://clearview-tools.github.io/clearview-magnifier/licenses.json'
 };
 ```
 
-正式售卖前：
-
-```bash
-cp docs/licenses.example.json docs/licenses.json
-# 填入已售密钥，提交并 push（勿把测试密钥 DEV-0001 留在生产列表）
-```
+正式售卖前在 `docs/licenses.json` 填入已售密钥并 push（勿公开测试密钥 `CVPRO-DEV-0001-TEST`）。
 
 ---
 
