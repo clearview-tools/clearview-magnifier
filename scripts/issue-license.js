@@ -59,7 +59,8 @@ console.log(`1. 安装扩展： https://github.com/clearview-tools/clearview-mag
 2. 点击浏览器工具栏 ClearView 图标
 3. 输入 License：${key}
 4. 点「激活」，勾选「启用实时翻译」
-5. 问题反馈： https://github.com/clearview-tools/clearview-magnifier/issues
+5. Pro 自激活日起有效期 1 年，到期可续购后重新激活
+6. 问题反馈： https://github.com/clearview-tools/clearview-magnifier/issues
 `);
 
 if (add) {

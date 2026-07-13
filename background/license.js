@@ -1,6 +1,7 @@
 const LICENSE_STORAGE_KEY = 'clearviewLicense';
 const QUOTA_STORAGE_KEY = 'clearviewTranslateQuota';
 const PRO_DAILY_LIMIT = 500;
+const PRO_TERM_MS = 365 * 24 * 60 * 60 * 1000;
 
 function normalizeLicenseKey(key) {
   return (key || '').trim().toUpperCase();
@@ -58,19 +59,58 @@ async function setLicenseRecord(record) {
   await chrome.storage.local.set({ [LICENSE_STORAGE_KEY]: record });
 }
 
-async function isProActive() {
+async function getValidatedLicenseRecord() {
   const record = await getLicenseRecord();
+  if (!record.active) return record;
+
+  const activatedAt = record.activatedAt || Date.now();
+  const expiresAt = record.expiresAt || (activatedAt + PRO_TERM_MS);
+
+  if (Date.now() > expiresAt) {
+    await migrateSettingsToLocal();
+    const expired = {
+      active: false,
+      key: '',
+      lastKey: record.key,
+      lastExpiredAt: expiresAt
+    };
+    await setLicenseRecord(expired);
+    return expired;
+  }
+
+  const normalized = {
+    active: true,
+    key: record.key,
+    activatedAt,
+    expiresAt
+  };
+  if (record.expiresAt !== expiresAt || record.activatedAt !== activatedAt) {
+    await setLicenseRecord(normalized);
+  }
+  return normalized;
+}
+
+async function isProActive() {
+  const record = await getValidatedLicenseRecord();
   return !!record.active;
 }
 
 async function getProStatus() {
-  const isPro = await isProActive();
+  const record = await getValidatedLicenseRecord();
+  const isPro = !!record.active;
   const quota = await getTranslateQuota(isPro);
+  const daysRemaining = isPro
+    ? Math.max(0, Math.ceil((record.expiresAt - Date.now()) / (24 * 60 * 60 * 1000)))
+    : 0;
   return {
     isPro,
     dailyLimit: isPro ? PRO_DAILY_LIMIT : 0,
     quotaUsed: quota.used,
-    quotaRemaining: isPro ? Math.max(0, PRO_DAILY_LIMIT - quota.used) : 0
+    quotaRemaining: isPro ? Math.max(0, PRO_DAILY_LIMIT - quota.used) : 0,
+    activatedAt: isPro ? record.activatedAt : null,
+    expiresAt: isPro ? record.expiresAt : null,
+    daysRemaining,
+    licenseExpired: !isPro && !!record.lastExpiredAt
   };
 }
 
@@ -106,14 +146,23 @@ async function activateLicense(key) {
   if (!result.valid) return result;
 
   const normalized = normalizeLicenseKey(key);
+  const now = Date.now();
+  const expiresAt = now + PRO_TERM_MS;
   await setLicenseRecord({
     active: true,
     key: normalized,
-    activatedAt: Date.now()
+    activatedAt: now,
+    expiresAt
   });
 
   await migrateSettingsToSync();
-  return { valid: true, isPro: true };
+  return {
+    valid: true,
+    isPro: true,
+    activatedAt: now,
+    expiresAt,
+    daysRemaining: Math.ceil(PRO_TERM_MS / (24 * 60 * 60 * 1000))
+  };
 }
 
 async function deactivateLicense() {

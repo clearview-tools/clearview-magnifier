@@ -90,6 +90,7 @@ cd e:\pythonproject\clearview-magnifier
 ✅ 放大镜内实时翻译
 ✅ 多 API 优先与每日 500 次额度
 ✅ 设置 Chrome 云同步
+✅ License 自激活日起有效期 1 年
 
 【安装扩展（免费加载）】
 1. 下载：https://github.com/clearview-tools/clearview-magnifier/releases
@@ -100,6 +101,7 @@ cd e:\pythonproject\clearview-magnifier
 打开扩展图标 → 输入密钥 → 点「激活」→ 勾选「启用实时翻译」
 
 【说明】
+- Pro 有效期为激活日起 1 年，到期需续购后重新激活
 - 需 Chrome / Edge 等 Chromium 浏览器
 - 翻译需访问外网 API，网络不佳时可能变慢
 - 支持：GitHub Issues 留言

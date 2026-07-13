@@ -62,9 +62,14 @@ async function refreshProUI() {
     badge.className = isPro ? 'plan-badge plan-pro' : 'plan-badge plan-free';
   }
   if (proDetails) {
-    proDetails.textContent = isPro
-      ? `翻译额度：今日剩余 ${status.quotaRemaining}/${status.dailyLimit} 次 · 设置云同步已开启`
-      : '升级 Pro 解锁实时翻译、优先 API、更高额度与设置云同步';
+    if (isPro) {
+      const expiry = status.expiresAt ? formatDate(status.expiresAt) : '';
+      proDetails.textContent = `Pro 剩余 ${status.daysRemaining} 天（至 ${expiry}）· 翻译今日剩余 ${status.quotaRemaining}/${status.dailyLimit} 次`;
+    } else if (status.licenseExpired) {
+      proDetails.textContent = 'Pro 已到期，请续购 License 后重新激活';
+    } else {
+      proDetails.textContent = '升级 Pro 解锁实时翻译、优先 API、更高额度与设置云同步（License 有效期 1 年）';
+    }
   }
   if (freeHint) freeHint.hidden = isPro;
   if (translateSection) translateSection.classList.toggle('pro-locked', !isPro);
@@ -124,6 +129,11 @@ function updateLabels(data) {
   if (lensSizeVal && data.lensSize !== undefined) lensSizeVal.textContent = `${data.lensSize}px`;
 }
 
+function formatDate(timestamp) {
+  if (!timestamp) return '';
+  return new Date(timestamp).toLocaleDateString('zh-CN');
+}
+
 function scheduleSave() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(saveSettings, 120);
@@ -167,7 +177,8 @@ async function activateLicense() {
 
   const result = await chrome.runtime.sendMessage({ type: 'activate-license', key });
   if (result?.valid) {
-    if (msg) msg.textContent = 'Pro 已激活';
+    const expiry = result.expiresAt ? formatDate(result.expiresAt) : '';
+    if (msg) msg.textContent = expiry ? `Pro 已激活，有效期至 ${expiry}` : 'Pro 已激活';
     settingsStorage = await getSettingsStorage();
     await settingsStorage.set({ translateEnabled: true });
     const translateEnabled = document.getElementById('translateEnabled');

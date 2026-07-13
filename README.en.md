@@ -4,7 +4,7 @@
 
 A Chrome extension with a local screen magnifier, optional live translation, and reading aids to make web content easier to read.
 
-**Current version:** 1.1.2
+**Current version:** 1.1.3
 
 - **Repository:** [github.com/clearview-tools/clearview-magnifier](https://github.com/clearview-tools/clearview-magnifier)
 - **Releases:** [Download ZIP](https://github.com/clearview-tools/clearview-magnifier/releases)
@@ -23,7 +23,7 @@ A Chrome extension with a local screen magnifier, optional live translation, and
 | Translation quota | — | 500 / day |
 | Settings storage | Local | Chrome sync |
 
-**Pro activation:** Enter a License Key in the extension popup. Keys are issued after purchase via [Afdian](https://afdian.com/a/clearview-tools) (or contact us on GitHub Issues for international users). Maintainers generate keys with `node scripts/issue-license.js`.
+**Pro activation:** Enter a License Key in the extension popup. **Valid for 1 year from activation** (reverts to free when expired; purchase a new key to renew). Keys are issued after purchase via [Afdian](https://afdian.com/a/clearview-tools) (or contact us on GitHub Issues for international users). Maintainers generate keys with `node scripts/issue-license.js`.
 
 ## Download & install
 

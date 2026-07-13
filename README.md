@@ -4,7 +4,7 @@
 
 一款 Chrome 浏览器扩展，提供本地屏幕放大镜、实时翻译与多种阅读辅助功能，帮助用户更轻松地阅读网页内容。
 
-当前版本：**1.1.2**
+当前版本：**1.1.3**
 
 开源仓库：[github.com/clearview-tools/clearview-magnifier](https://github.com/clearview-tools/clearview-magnifier)  
 隐私政策：[clearview-tools.github.io/clearview-magnifier/privacy.html](https://clearview-tools.github.io/clearview-magnifier/privacy.html)
@@ -21,7 +21,7 @@
 | 翻译额度 | — | 500 次/天 |
 | 设置云同步 | 本地存储 | Chrome 同步 |
 
-Pro 激活：扩展面板输入 License Key。正式密钥通过 [爱发电等渠道](docs/sell-domestic.md) 购买后发放；开发者用 `node scripts/issue-license.js` 生成。
+Pro 激活：扩展面板输入 License Key，**自激活日起有效期 1 年**（到期后自动恢复免费版，续购可重新激活）。正式密钥通过 [爱发电等渠道](docs/sell-domestic.md) 购买后发放；开发者用 `node scripts/issue-license.js` 生成。
 
 ## 下载与安装
 
