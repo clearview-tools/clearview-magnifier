@@ -20,5 +20,14 @@ foreach ($item in $items) {
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
 Compress-Archive -Path $stageDir -DestinationPath $zipPath -Force
 
+$forbidden = @('CVPRO-DEV', 'DEV-0001-TEST', '测试密钥')
+$zipEntries = (Get-Content $zipPath -Encoding Byte -ReadCount 0)
+$zipText = [System.Text.Encoding]::UTF8.GetString($zipEntries)
+foreach ($pattern in $forbidden) {
+  if ($zipText -match [regex]::Escape($pattern)) {
+    throw "打包失败：ZIP 中含禁止内容 ($pattern)"
+  }
+}
+
 Write-Host "已打包: $zipPath" -ForegroundColor Green
 Write-Host "版本:   v$version"

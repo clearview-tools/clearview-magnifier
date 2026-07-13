@@ -208,7 +208,7 @@
       if (msg.action === 'toggle-translate') {
         refreshProStatus().then(() => {
           if (!isPro) {
-            showToast('实时翻译为 Pro 功能 — 请输入 License：CVPRO-DEV-0001-TEST');
+            showToast('实时翻译为 Pro 功能 — 请在扩展面板购买或激活 License');
             return;
           }
           settings.translateEnabled = !settings.translateEnabled;
@@ -687,7 +687,7 @@
       : '';
     translatePanel.innerHTML = `${original}
       <div class="clearview-translate-error">实时翻译为 Pro 功能</div>
-      <div class="clearview-translate-original">扩展面板输入测试密钥 CVPRO-DEV-0001-TEST 激活 · 每日 ${proStatus.dailyLimit || 500} 次额度</div>`;
+      <div class="clearview-translate-original">点击扩展图标购买 Pro 或输入 License 激活 · 每日 ${proStatus.dailyLimit || 500} 次额度</div>`;
   }
 
   function scheduleLinkPreview() {

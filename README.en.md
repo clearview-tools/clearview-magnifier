@@ -4,7 +4,7 @@
 
 A Chrome extension with a local screen magnifier, optional live translation, and reading aids to make web content easier to read.
 
-**Current version:** 1.1.1
+**Current version:** 1.1.2
 
 - **Repository:** [github.com/clearview-tools/clearview-magnifier](https://github.com/clearview-tools/clearview-magnifier)
 - **Releases:** [Download ZIP](https://github.com/clearview-tools/clearview-magnifier/releases)
@@ -31,7 +31,7 @@ A Chrome extension with a local screen magnifier, optional live translation, and
 
 ### Option A: GitHub Release (recommended)
 
-1. Download the latest `clearview-magnifier-v*.zip` from [Releases](https://github.com/clearview-tools/clearview-magnifier/releases)
+1. Download **`clearview-magnifier-v*.zip`** from [Releases](https://github.com/clearview-tools/clearview-magnifier/releases) — **not** “Source code”
 2. Unzip to a folder on your computer
 3. Open `chrome://extensions/` in Chrome
 4. Enable **Developer mode** (top right)

@@ -16,6 +16,7 @@ function Get-GhExe {
     throw "gh not found. Install: winget install GitHub.cli"
 }
 
+& (Join-Path $PSScriptRoot "verify-no-test-key.ps1")
 & (Join-Path $PSScriptRoot "pack-extension.ps1")
 
 $manifest = Get-Content "manifest.json" -Raw | ConvertFrom-Json

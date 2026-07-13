@@ -86,7 +86,7 @@ const SITE_CONFIG = {
 };
 ```
 
-正式售卖前在 `docs/licenses.json` 填入已售密钥并 push（勿公开测试密钥 `CVPRO-DEV-0001-TEST`）。
+正式售卖前在 `docs/licenses.json` 填入已售密钥并 push（勿提交测试用或无效的公开密钥）。
 
 ---
 

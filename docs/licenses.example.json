@@ -1,6 +1,6 @@
 {
   "keys": [
-    "CVPRO-DEV-0001-TEST"
+    "CVPRO-XXXX-XXXX-XXXX"
   ],
-  "_comment": "复制为 licenses.json 并填入已售出的 License Key。也可使用 scripts/generate-license-key.js 生成带校验码的密钥。"
+  "_comment": "示例占位。正式密钥用 node scripts/generate-license-key.js 生成，勿提交真实已售密钥到公开仓库以外的渠道。"
 }

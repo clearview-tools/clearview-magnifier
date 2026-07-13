@@ -1,7 +1,6 @@
 const LICENSE_STORAGE_KEY = 'clearviewLicense';
 const QUOTA_STORAGE_KEY = 'clearviewTranslateQuota';
 const PRO_DAILY_LIMIT = 500;
-const DEV_LICENSE_KEY = 'CVPRO-DEV-0001-TEST';
 
 function normalizeLicenseKey(key) {
   return (key || '').trim().toUpperCase();
@@ -39,7 +38,6 @@ async function fetchRemoteLicenseKeys() {
 async function verifyLicenseKey(key) {
   const normalized = normalizeLicenseKey(key);
   if (!normalized) return { valid: false, error: '请输入 License Key' };
-  if (normalized === DEV_LICENSE_KEY) return { valid: true };
   if (!isValidLicenseFormat(normalized)) {
     return { valid: false, error: '密钥格式应为 CVPRO-XXXX-XXXX-XXXX' };
   }

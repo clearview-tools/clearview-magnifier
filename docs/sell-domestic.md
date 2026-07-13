@@ -31,7 +31,9 @@ cd e:\pythonproject\clearview-magnifier
 
 ### 2. 创建 GitHub Release
 
-**方式 A：命令行**（需 `gh auth login` 成功）
+> 下载说明：只让用户下 **`clearview-magnifier-v*.zip`**，不要下 **Source code**（源码归档会包含 `scripts/` 等，且无 `.git`）。
+
+**方式 A：命令行**
 
 ```powershell
 .\scripts\release-github.ps1
@@ -143,7 +145,7 @@ purchaseUrl: 'https://afdian.com/a/clearview-tools',
 
 ## 五、注意事项
 
-- **不要**在公开商品页发布测试密钥 `CVPRO-DEV-0001-TEST`  
+- **不要**在公开商品页、安装包或源码中发布测试用 License 密钥  
 - `docs/licenses.json` 在 GitHub 公开；只放**已售出**密钥即可  
 - 退款：从 `licenses.json` 删除对应 key 并 push，远程校验即失效（已激活用户本地仍有效，严重情况需改密钥算法批次）  
 - 以后能访问 Google 时，再上架 Chrome 商店，商店版可与 GitHub 版共用 License  

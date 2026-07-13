@@ -14,7 +14,7 @@ const SITE_CONFIG = {
 
   /**
    * 已售出 License 远程白名单（docs/licenses.json 部署到 Pages 后的 URL）
-   * 留空则仅校验码算法 + 开发测试密钥有效
+   * 留空则仅校验码算法有效
    */
   licensesUrl: 'https://clearview-tools.github.io/clearview-magnifier/licenses.json'
 };
