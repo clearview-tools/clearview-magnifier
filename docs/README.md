@@ -1,31 +1,55 @@
-# GitHub Pages 部署说明
+# 静态页面托管（隐私政策）
 
-本目录用于托管 **隐私政策** 等静态页面，供 Chrome 网上应用店审核使用。
+Chrome 网上应用店要求填写**可公开访问的隐私政策 URL**。
 
-## 部署步骤
+**若你走「品牌 + 开源」路线**，推荐 **GitHub 组织 + Pages**，完整步骤见 **[brand-open-source.md](./brand-open-source.md)**。
 
-1. 将本仓库推送到 GitHub（例如 `yourname/clearview-magnifier`）
-2. 打开仓库 **Settings → Pages**
-3. **Source** 选择 `Deploy from a branch`
-4. **Branch** 选择 `main`，文件夹选择 **`/docs`**
-5. 保存后等待 1～2 分钟
+## 推荐：GitHub 组织 + Pages
 
-部署完成后，隐私政策 URL 为：
+1. 创建组织（如 `clearview-app`），仓库 `clearview-magnifier` 设为 **Public**
+2. **Settings → Pages** → 分支 `main`，目录 **`/docs`**
+3. 隐私政策 URL：
 
 ```
-https://<你的用户名>.github.io/clearview-magnifier/privacy.html
+https://<组织名>.github.io/clearview-magnifier/privacy.html
 ```
 
-将此 URL 填入 Chrome Web Store 开发者控制台的 **Privacy policy** 字段。
+4. License 白名单（可选）：将 `licenses.json` 放在 `docs/` 一并发布：
+
+```
+https://<组织名>.github.io/clearview-magnifier/licenses.json
+```
+
+5. 填入 `background/site-config.js` 的 `privacyUrl`、`licensesUrl`、`supportUrl`
+
+对外显示组织品牌，不出现个人用户名。
+
+## 备选：Cloudflare Pages
+
+若暂时不想用 GitHub 公开仓库，可只上传 `docs/` 到 Cloudflare Pages（`*.pages.dev`）。适合纯静态托管，与开源品牌弱绑定。
+
+## 备选：自有域名
+
+将 `docs/` 部署到 Vercel / Netlify / 对象存储，例如 `https://clearview.example.com/privacy.html`。
+
+---
+
+## 项目内配置
+
+编辑 **`background/site-config.js`**：
+
+| 字段 | 用途 |
+|------|------|
+| `privacyUrl` | Chrome 商店隐私政策 |
+| `purchaseUrl` | 扩展面板「购买 / 咨询」 |
+| `supportUrl` | 组织 Issues 或客服邮箱 |
+| `licensesUrl` | 已售 License 列表（可留空） |
 
 ## 文件说明
 
 | 文件 | 说明 |
 |------|------|
-| `privacy.html` | 隐私政策正文（商店审核必填） |
-| `index.html` | 自动跳转到隐私政策 |
-
-## 自定义
-
-- 修改 `privacy.html` 中的「联系我们」为实际邮箱或 GitHub Issues 链接
-- 更新「生效日期」与版本号
+| `privacy.html` | 隐私政策正文 |
+| `index.html` | 跳转到隐私政策 |
+| `licenses.example.json` | 复制为 `licenses.json` 后部署 |
+| `brand-open-source.md` | 组织创建、开源与上架路线图 |

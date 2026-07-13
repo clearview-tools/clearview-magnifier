@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ClearView Magnifier",
-  "version": "1.0.4",
+  "version": "1.1.1",
   "description": "Local magnifier with real-time translation and reading aids",
   "permissions": [
     "activeTab",

@@ -36,7 +36,7 @@
     zoom: 2.5,
     lensSize: 220,
     shape: 'circle',
-    translateEnabled: true,
+    translateEnabled: false,
     sourceLang: 'auto',
     targetLang: 'zh-CN',
     highContrast: false,
@@ -81,6 +81,9 @@
   // 会话级缩放/大小，每次启动放大镜时从设置重置，滚轮调整不写入 storage
   let sessionZoom = DEFAULTS.zoom;
   let sessionLensSize = DEFAULTS.lensSize;
+  let isPro = false;
+  let proStatus = { dailyLimit: 0, quotaRemaining: 0, quotaUsed: 0 };
+  let settingsStorageArea = 'local';
 
   init();
 
@@ -89,17 +92,47 @@
   async function init() {
     if (!isContextValid()) return;
     try {
-      const stored = await chrome.storage.sync.get(DEFAULTS);
+      await refreshProStatus();
+      const storage = await getSettingsStorage();
+      settingsStorageArea = storage === chrome.storage.sync ? 'sync' : 'local';
+      const stored = await storage.get(DEFAULTS);
       settings = { ...DEFAULTS, ...stored };
       if (stored.closeOnRelease === undefined) {
         settings.closeOnRelease = false;
       }
+      if (!isPro) settings.translateEnabled = false;
     } catch (err) {
       if (handleIfInvalidated(err)) return;
       console.warn('[ClearView] 读取设置失败:', err);
     }
     chrome.storage.onChanged.addListener(onStorageChanged);
     chrome.runtime.onMessage.addListener(handleMessage);
+  }
+
+  async function refreshProStatus() {
+    try {
+      proStatus = await sendToBackground({ type: 'get-pro-status' });
+      isPro = !!proStatus.isPro;
+    } catch {
+      isPro = false;
+      proStatus = { isPro: false, dailyLimit: 0, quotaRemaining: 0, quotaUsed: 0 };
+    }
+    return proStatus;
+  }
+
+  async function getSettingsStorage() {
+    if (!isContextValid()) return chrome.storage.local;
+    try {
+      const result = await sendToBackground({ type: 'get-settings-storage' });
+      return result?.area === 'sync' ? chrome.storage.sync : chrome.storage.local;
+    } catch {
+      return chrome.storage.local;
+    }
+  }
+
+  async function saveSetting(key, value) {
+    const storage = await getSettingsStorage();
+    await storage.set({ [key]: value });
   }
 
   function applySettingsChanges(partial) {
@@ -111,10 +144,12 @@
       syncLensPosition();
       scheduleLensDraw();
       updateHud();
+      if (partial.translateEnabled !== undefined) scheduleTranslate();
     }
   }
 
-  function onStorageChanged(changes) {
+  function onStorageChanged(changes, areaName) {
+    if (areaName !== settingsStorageArea) return;
     for (const key of Object.keys(changes)) {
       settings[key] = changes[key].newValue;
     }
@@ -155,7 +190,9 @@
     }
     try {
       const response = await chrome.runtime.sendMessage(message);
-      if (response?.error) throw new Error(response.error);
+      if (response?.error && message.type === 'translate') {
+        throw new Error(response.error);
+      }
       return response;
     } catch (err) {
       if (handleIfInvalidated(err)) {
@@ -169,15 +206,38 @@
     if (msg.type === 'command') {
       if (msg.action === 'toggle-magnifier') toggleMagnifier();
       if (msg.action === 'toggle-translate') {
-        settings.translateEnabled = !settings.translateEnabled;
-        chrome.storage.sync.set({ translateEnabled: settings.translateEnabled });
-        showToast(settings.translateEnabled ? '实时翻译已开启' : '实时翻译已关闭');
-        if (state.active) scheduleTranslate();
+        refreshProStatus().then(() => {
+          if (!isPro) {
+            showToast('实时翻译为 Pro 功能 — 请输入 License：CVPRO-DEV-0001-TEST');
+            return;
+          }
+          settings.translateEnabled = !settings.translateEnabled;
+          saveSetting('translateEnabled', settings.translateEnabled);
+          showToast(settings.translateEnabled ? '实时翻译已开启' : '实时翻译已关闭');
+          if (state.active) scheduleTranslate();
+        });
       }
     }
+    if (msg.type === 'pro-updated') {
+      refreshProStatus().then(async () => {
+        const storage = await getSettingsStorage();
+        settingsStorageArea = storage === chrome.storage.sync ? 'sync' : 'local';
+        const stored = await storage.get(['translateEnabled']);
+        if (isPro) {
+          settings.translateEnabled = !!stored.translateEnabled;
+        } else {
+          settings.translateEnabled = false;
+          if (translatePanel) translatePanel.style.display = 'none';
+        }
+        if (state.active && settings.translateEnabled) scheduleTranslate();
+      });
+    }
     if (msg.type === 'settings-updated') {
-      Object.assign(settings, msg.settings);
-      applySettingsChanges(msg.settings);
+      refreshProStatus().then(() => {
+        Object.assign(settings, msg.settings);
+        if (!isPro) settings.translateEnabled = false;
+        applySettingsChanges(msg.settings);
+      });
     }
   }
 
@@ -403,6 +463,8 @@
     sessionZoom = settings.zoom;
     sessionLensSize = settings.lensSize;
 
+    await refreshProStatus();
+
     createOverlay();
     syncLensPosition();
     showToast('ClearView 已启动 — 移动鼠标跟随 · Alt+滚轮缩放 · Esc 退出');
@@ -613,7 +675,19 @@
       return;
     }
     clearTimeout(translateTimer);
-    translateTimer = setTimeout(doTranslate, 500);
+    translateTimer = setTimeout(() => doTranslate(), 500);
+  }
+
+  function showProUpgradePanel(text) {
+    if (!translatePanel) return;
+    translatePanel.style.display = 'block';
+    translatePanel.dataset.loaded = '1';
+    const original = text
+      ? `<div class="clearview-translate-original">${escapeHtml(text)}</div>`
+      : '';
+    translatePanel.innerHTML = `${original}
+      <div class="clearview-translate-error">实时翻译为 Pro 功能</div>
+      <div class="clearview-translate-original">扩展面板输入测试密钥 CVPRO-DEV-0001-TEST 激活 · 每日 ${proStatus.dailyLimit || 500} 次额度</div>`;
   }
 
   function scheduleLinkPreview() {
@@ -632,6 +706,12 @@
 
   async function doTranslate() {
     if (!state.active || !settings.translateEnabled) return;
+
+    await refreshProStatus();
+    if (!isPro) {
+      showProUpgradePanel();
+      return;
+    }
 
     const textInfo = getTextAtPoint(state.mouseX, state.mouseY);
     const text = textInfo.text;
@@ -654,6 +734,17 @@
     const from = settings.sourceLang === 'auto' ? detectLang(text) : settings.sourceLang;
     const to = settings.targetLang;
 
+    if (from === to || (from === 'zh-CN' && to === 'zh')) {
+      if (translatePanel) {
+        translatePanel.dataset.loaded = '1';
+        translatePanel.innerHTML = `
+          <div class="clearview-translate-label">原文 ${langLabel(from)}</div>
+          <div class="clearview-translate-original">${escapeHtml(text)}</div>
+          <div class="clearview-translate-error">源语言与目标语言相同，请在设置中修改目标语言</div>`;
+      }
+      return;
+    }
+
     try {
       const result = await sendToBackground({
         type: 'translate',
@@ -665,16 +756,28 @@
       const translated = result?.translated || text;
       if (translatePanel) {
         translatePanel.dataset.loaded = '1';
+        const quotaHint = result?.quotaRemaining !== undefined
+          ? `<div class="clearview-translate-label">Pro 今日剩余 ${result.quotaRemaining} 次</div>`
+          : '';
         translatePanel.innerHTML = `
+          ${quotaHint}
           <div class="clearview-translate-label">译文 ${langLabel(to)}</div>
           <div class="clearview-translate-result">${escapeHtml(translated)}</div>
           <div class="clearview-translate-label">原文 ${langLabel(from)}</div>
           <div class="clearview-translate-original">${escapeHtml(text)}</div>`;
       }
-    } catch {
+    } catch (err) {
+      const code = err?.message || '';
       if (translatePanel) {
-        translatePanel.innerHTML = `<div class="clearview-translate-original">${escapeHtml(text)}</div>
-          <div class="clearview-translate-error">翻译暂不可用</div>`;
+        if (code === 'PRO_REQUIRED') {
+          showProUpgradePanel(text);
+        } else if (code === 'QUOTA_EXCEEDED') {
+          translatePanel.innerHTML = `<div class="clearview-translate-original">${escapeHtml(text)}</div>
+            <div class="clearview-translate-error">今日 Pro 翻译额度已用完，明日自动重置</div>`;
+        } else {
+          translatePanel.innerHTML = `<div class="clearview-translate-original">${escapeHtml(text)}</div>
+            <div class="clearview-translate-error">翻译暂不可用${code ? `（${escapeHtml(code)}）` : ''}</div>`;
+        }
       }
     }
   }
@@ -806,7 +909,7 @@
       return;
     }
     let output = text;
-    if (settings.translateEnabled) {
+    if (settings.translateEnabled && isPro) {
       const from = settings.sourceLang === 'auto' ? detectLang(text) : settings.sourceLang;
       try {
         const result = await sendToBackground({
@@ -814,6 +917,8 @@
         });
         if (result?.translated) output = `${result.translated}\n---\n${text}`;
       } catch { /* keep original */ }
+    } else if (settings.translateEnabled && !isPro) {
+      showToast('译文复制为 Pro 功能');
     }
     await copyToClipboard(output);
     showToast('文字已复制到剪贴板');

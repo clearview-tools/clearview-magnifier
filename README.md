@@ -2,7 +2,21 @@
 
 一款 Chrome 浏览器扩展，提供本地屏幕放大镜、实时翻译与多种阅读辅助功能，帮助用户更轻松地阅读网页内容。
 
-当前版本：**1.0.4**
+当前版本：**1.1.0**
+
+## 免费版 vs Pro
+
+| 功能 | 免费版 | Pro |
+|------|--------|-----|
+| 屏幕放大镜、滚轮缩放 | ✅ | ✅ |
+| 阅读线、十字准星、反色等 | ✅ | ✅ |
+| 颜色拾取、链接预览 | ✅ | ✅ |
+| 实时翻译 | ❌ | ✅ |
+| 优先 API（Google 优先） | ❌ | ✅ |
+| 翻译额度 | — | 500 次/天 |
+| 设置云同步 | 本地存储 | Chrome 同步 |
+
+Pro 激活：扩展面板输入 License Key。测试可用 `CVPRO-DEV-0001-TEST`；正式密钥用 `node scripts/generate-license-key.js` 生成，或维护 `docs/licenses.json`。
 
 ## 功能特性
 
@@ -24,15 +38,12 @@
 
 > **注意：** 扩展无法在 `chrome://` 等浏览器内部页面上运行；安装或更新扩展后，若功能异常，请刷新当前网页（F5）。
 
-### 隐私政策（Chrome 商店必填）
+### 隐私政策与品牌（Chrome 商店必填）
 
-静态页面位于 `docs/privacy.html`，可通过 **GitHub Pages** 免费托管：
+推荐 **GitHub 组织 + Pages** 做品牌开源：对外是 `组织名.github.io`，不暴露个人账号。  
+完整步骤见 **[docs/brand-open-source.md](docs/brand-open-source.md)**。
 
-1. 推送仓库到 GitHub
-2. **Settings → Pages** → Source 选 `main` 分支、`/docs` 文件夹
-3. 部署后隐私政策 URL：`https://<用户名>.github.io/<仓库名>/privacy.html`
-
-详细步骤见 [docs/README.md](docs/README.md)。
+部署 `docs/` 后，将 URL 写入 `background/site-config.js` 并填入 Chrome 商店。
 
 本地已初始化 Git 仓库。首次发布请在项目目录执行：
 

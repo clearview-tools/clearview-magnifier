@@ -11,9 +11,45 @@
     <div class="logo">CV</div>
     <div>
       <h1>ClearView</h1>
-      <p>阅屏助手 v1.0</p>
+      <p>阅屏助手 v1.1</p>
     </div>
+    <span id="planBadge" class="plan-badge plan-free">免费版</span>
   </header>
+
+  <section class="section pro-section">
+    <h2>版本</h2>
+    <p id="proDetails" class="pro-details">升级 Pro 解锁实时翻译、优先 API、更高额度与设置云同步</p>
+    <div class="plan-grid">
+      <div class="plan-card">
+        <strong>免费版</strong>
+        <ul>
+          <li>放大镜与滚轮缩放</li>
+          <li>阅读线、十字准星</li>
+          <li>反色 / 高对比度</li>
+          <li>颜色拾取、链接预览</li>
+        </ul>
+      </div>
+      <div class="plan-card plan-card-pro">
+        <strong>Pro</strong>
+        <ul>
+          <li>实时翻译</li>
+          <li>优先 API（Google 优先）</li>
+          <li>每日 500 次翻译额度</li>
+          <li>设置云同步</li>
+        </ul>
+      </div>
+    </div>
+    <div class="license-row">
+      <input type="text" id="licenseKey" placeholder="CVPRO-XXXX-XXXX-XXXX" spellcheck="false">
+      <button type="button" id="activateLicense" class="btn-primary">激活</button>
+    </div>
+    <div class="license-actions">
+      <button type="button" id="deactivateLicense" class="btn-ghost">恢复免费版</button>
+      <a id="purchaseLink" href="#" target="_blank" rel="noopener" hidden>购买 / 咨询</a>
+    </div>
+    <p id="licenseMsg" class="license-msg"></p>
+    <p id="freeHint" class="free-hint">测试密钥：<code>CVPRO-DEV-0001-TEST</code></p>
+  </section>
 
   <section class="section">
     <h2>快捷启动</h2>
@@ -27,8 +63,8 @@
     </div>
   </section>
 
-  <section class="section">
-    <h2>翻译语言</h2>
+  <section class="section" id="translateSection">
+    <h2>翻译语言 <span class="pro-tag">Pro</span></h2>
     <div class="row">
       <label>源语言</label>
       <select id="sourceLang">
@@ -57,8 +93,8 @@
       </select>
     </div>
     <label class="checkbox">
-      <input type="checkbox" id="translateEnabled" checked>
-      启用实时翻译
+      <input type="checkbox" id="translateEnabled">
+      启用实时翻译（Pro）
     </label>
   </section>
 

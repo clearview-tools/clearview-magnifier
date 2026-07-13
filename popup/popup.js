@@ -2,7 +2,7 @@ const DEFAULTS = {
   zoom: 2.5,
   lensSize: 220,
   shape: 'circle',
-  translateEnabled: true,
+  translateEnabled: false,
   sourceLang: 'auto',
   targetLang: 'zh-CN',
   readingLine: true,
@@ -20,22 +20,81 @@ const fields = [
 ];
 
 let saveTimer = null;
+let isPro = false;
+let settingsStorage = chrome.storage.local;
+
+async function applySiteLinks() {
+  try {
+    const site = await chrome.runtime.sendMessage({ type: 'get-site-config' });
+    const purchaseLink = document.getElementById('purchaseLink');
+    if (purchaseLink && site?.purchaseUrl) {
+      purchaseLink.href = site.purchaseUrl;
+      purchaseLink.hidden = false;
+    }
+  } catch {
+    /* 忽略 */
+  }
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const stored = await chrome.storage.sync.get(DEFAULTS);
+  await applySiteLinks();
+  await refreshProUI();
+  await loadSettings();
+  bindSettingsEvents();
+  bindProEvents();
+});
+
+async function refreshProUI() {
+  const status = await chrome.runtime.sendMessage({ type: 'get-pro-status' });
+  isPro = !!status?.isPro;
+
+  const badge = document.getElementById('planBadge');
+  const proDetails = document.getElementById('proDetails');
+  const freeHint = document.getElementById('freeHint');
+  const translateSection = document.getElementById('translateSection');
+
+  if (badge) {
+    badge.textContent = isPro ? 'Pro' : '免费版';
+    badge.className = isPro ? 'plan-badge plan-pro' : 'plan-badge plan-free';
+  }
+  if (proDetails) {
+    proDetails.textContent = isPro
+      ? `翻译额度：今日剩余 ${status.quotaRemaining}/${status.dailyLimit} 次 · 设置云同步已开启`
+      : '升级 Pro 解锁实时翻译、优先 API、更高额度与设置云同步';
+  }
+  if (freeHint) freeHint.hidden = isPro;
+  if (translateSection) translateSection.classList.toggle('pro-locked', !isPro);
+
+  const translateEnabled = document.getElementById('translateEnabled');
+  if (translateEnabled) {
+    translateEnabled.disabled = !isPro;
+    if (!isPro) translateEnabled.checked = false;
+  }
+}
+
+async function getSettingsStorage() {
+  const result = await chrome.runtime.sendMessage({ type: 'get-settings-storage' });
+  return result?.area === 'sync' ? chrome.storage.sync : chrome.storage.local;
+}
+
+async function loadSettings() {
+  settingsStorage = await getSettingsStorage();
+  const stored = await settingsStorage.get(DEFAULTS);
 
   for (const key of fields) {
     const el = document.getElementById(key);
     if (!el) continue;
     if (el.type === 'checkbox') {
-      el.checked = !!stored[key];
+      el.checked = key === 'translateEnabled' && !isPro ? false : !!stored[key];
     } else {
       el.value = stored[key];
     }
   }
 
   updateLabels(stored);
+}
 
+function bindSettingsEvents() {
   for (const key of fields) {
     const el = document.getElementById(key);
     if (!el) continue;
@@ -47,7 +106,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
   }
-});
+}
+
+function bindProEvents() {
+  document.getElementById('activateLicense')?.addEventListener('click', activateLicense);
+  document.getElementById('deactivateLicense')?.addEventListener('click', deactivateLicense);
+}
 
 function updateLabels(data) {
   const zoomVal = document.getElementById('zoomVal');
@@ -62,18 +126,72 @@ function scheduleSave() {
 }
 
 async function saveSettings() {
+  if (!isPro) {
+    const translateEnabled = document.getElementById('translateEnabled');
+    if (translateEnabled) translateEnabled.checked = false;
+  }
+
   const settings = {};
   for (const key of fields) {
     const el = document.getElementById(key);
     if (!el) continue;
+    if (key === 'translateEnabled' && !isPro) {
+      settings[key] = false;
+      continue;
+    }
     settings[key] = el.type === 'checkbox' ? el.checked : el.value;
     if (el.type === 'range') settings[key] = parseFloat(settings[key]);
   }
 
-  await chrome.storage.sync.set(settings);
+  settingsStorage = await getSettingsStorage();
+  await settingsStorage.set(settings);
 
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (tab?.id) {
     chrome.tabs.sendMessage(tab.id, { type: 'settings-updated', settings }).catch(() => {});
+  }
+}
+
+async function activateLicense() {
+  const input = document.getElementById('licenseKey');
+  const msg = document.getElementById('licenseMsg');
+  const key = input?.value?.trim();
+  if (!key) {
+    if (msg) msg.textContent = '请输入 License Key';
+    return;
+  }
+
+  const result = await chrome.runtime.sendMessage({ type: 'activate-license', key });
+  if (result?.valid) {
+    if (msg) msg.textContent = 'Pro 已激活';
+    settingsStorage = await getSettingsStorage();
+    await settingsStorage.set({ translateEnabled: true });
+    const translateEnabled = document.getElementById('translateEnabled');
+    if (translateEnabled) translateEnabled.checked = true;
+    await refreshProUI();
+    await loadSettings();
+    await saveSettings();
+    notifyTabsProUpdated();
+  } else if (msg) {
+    msg.textContent = result?.error || '激活失败';
+  }
+}
+
+async function deactivateLicense() {
+  await chrome.runtime.sendMessage({ type: 'deactivate-license' });
+  const msg = document.getElementById('licenseMsg');
+  if (msg) msg.textContent = '已恢复免费版';
+  document.getElementById('licenseKey').value = '';
+  await refreshProUI();
+  await loadSettings();
+  notifyTabsProUpdated();
+}
+
+async function notifyTabsProUpdated() {
+  const tabs = await chrome.tabs.query({});
+  for (const tab of tabs) {
+    if (tab.id) {
+      chrome.tabs.sendMessage(tab.id, { type: 'pro-updated' }).catch(() => {});
+    }
   }
 }

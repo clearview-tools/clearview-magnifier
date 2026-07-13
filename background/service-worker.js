@@ -1,3 +1,5 @@
+importScripts('site-config.js', 'license.js');
+
 chrome.runtime.onInstalled.addListener(async () => {
   await reinjectContentScripts();
 });
@@ -31,11 +33,23 @@ const CACHE_TTL = 5 * 60 * 1000;
 const translateCache = new Map();
 const providerCooldown = new Map();
 
-const PROVIDERS = [
+const PRO_PROVIDERS = [
   { name: 'mymemory', translate: translateMyMemory, cooldownOnFail: 60 * 60 * 1000 },
   { name: 'google', translate: translateGoogle, cooldownOnFail: 5 * 60 * 1000 },
   { name: 'lingva', translate: translateLingva, cooldownOnFail: 5 * 60 * 1000 }
 ];
+
+const FETCH_TIMEOUT_MS = 10000;
+
+async function fetchWithTimeout(url, options = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'capture-screenshot') {
@@ -46,9 +60,34 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === 'translate') {
-    handleTranslate(message.text, message.from, message.to)
+    handleTranslate(message.text, message.from, message.to, message.skipQuota)
       .then(sendResponse)
       .catch((err) => sendResponse({ error: err.message, translated: message.text }));
+    return true;
+  }
+
+  if (message.type === 'get-pro-status') {
+    getProStatus().then(sendResponse);
+    return true;
+  }
+
+  if (message.type === 'activate-license') {
+    activateLicense(message.key).then(sendResponse);
+    return true;
+  }
+
+  if (message.type === 'deactivate-license') {
+    deactivateLicense().then(sendResponse);
+    return true;
+  }
+
+  if (message.type === 'get-site-config') {
+    sendResponse(SITE_CONFIG);
+    return true;
+  }
+
+  if (message.type === 'get-settings-storage') {
+    getSettingsStorageArea().then((area) => sendResponse({ area: area === chrome.storage.sync ? 'sync' : 'local' }));
     return true;
   }
 });
@@ -66,26 +105,48 @@ async function handleCapture(tabId) {
   return { dataUrl };
 }
 
-async function handleTranslate(text, from, to) {
+async function handleTranslate(text, from, to, skipQuota) {
+  const status = await getProStatus();
+  if (!status.isPro) {
+    throw new Error('PRO_REQUIRED');
+  }
+
   const trimmed = (text || '').trim();
   if (!trimmed || trimmed.length > 500) {
-    return { translated: trimmed, cached: false };
+    return { translated: trimmed, cached: false, isPro: true };
   }
 
   const cacheKey = `${from}|${to}|${trimmed}`;
   const cached = translateCache.get(cacheKey);
   if (cached && Date.now() - cached.time < CACHE_TTL) {
-    return { translated: cached.text, cached: true, provider: cached.provider };
+    return {
+      translated: cached.text,
+      cached: true,
+      provider: cached.provider,
+      isPro: true,
+      quotaRemaining: status.quotaRemaining
+    };
+  }
+
+  if (!skipQuota) {
+    const status = await getProStatus();
+    if (status.quotaRemaining <= 0) {
+      throw new Error('QUOTA_EXCEEDED');
+    }
   }
 
   let lastError = null;
 
-  for (const provider of PROVIDERS) {
+  for (const provider of PRO_PROVIDERS) {
     if (!isProviderAvailable(provider.name)) continue;
 
     try {
       const translated = await provider.translate(trimmed, from, to);
       if (!translated) continue;
+
+      if (!skipQuota) {
+        await consumeTranslateQuota(true);
+      }
 
       translateCache.set(cacheKey, {
         text: translated,
@@ -94,7 +155,14 @@ async function handleTranslate(text, from, to) {
       });
       trimCache();
 
-      return { translated, cached: false, provider: provider.name };
+      const updated = await getProStatus();
+      return {
+        translated,
+        cached: false,
+        provider: provider.name,
+        isPro: true,
+        quotaRemaining: updated.quotaRemaining
+      };
     } catch (err) {
       lastError = err;
       if (err.rateLimited) {
@@ -147,7 +215,7 @@ async function translateMyMemory(text, from, to) {
   const langpair = `${normalizeLang(from)}|${normalizeLang(to)}`;
   const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langpair}`;
 
-  const response = await fetch(url);
+  const response = await fetchWithTimeout(url);
   if (!response.ok) {
     const err = new Error(`MyMemory 异常 (${response.status})`);
     err.rateLimited = response.status === 429;
@@ -176,7 +244,7 @@ async function translateGoogle(text, from, to) {
   const tl = normalizeLang(to);
   const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&q=${encodeURIComponent(text)}`;
 
-  const response = await fetch(url);
+  const response = await fetchWithTimeout(url);
   if (!response.ok) {
     const err = new Error(`Google 翻译异常 (${response.status})`);
     err.rateLimited = response.status === 429;
@@ -194,7 +262,7 @@ async function translateLingva(text, from, to) {
   const target = toLingvaLang(to);
   const url = `https://lingva.ml/api/v1/${source}/${target}/${encodeURIComponent(text)}`;
 
-  const response = await fetch(url);
+  const response = await fetchWithTimeout(url);
   if (!response.ok) {
     const err = new Error(`Lingva 异常 (${response.status})`);
     err.rateLimited = response.status === 429;
