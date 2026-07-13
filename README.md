@@ -1,5 +1,7 @@
 # ClearView Magnifier（阅屏助手）
 
+[English README](README.en.md)
+
 一款 Chrome 浏览器扩展，提供本地屏幕放大镜、实时翻译与多种阅读辅助功能，帮助用户更轻松地阅读网页内容。
 
 当前版本：**1.1.1**
@@ -19,7 +21,42 @@
 | 翻译额度 | — | 500 次/天 |
 | 设置云同步 | 本地存储 | Chrome 同步 |
 
-Pro 激活：扩展面板输入 License Key。测试可用 `CVPRO-DEV-0001-TEST`；正式密钥用 `node scripts/generate-license-key.js` 生成，或维护 `docs/licenses.json`。
+Pro 激活：扩展面板输入 License Key。正式密钥通过 [爱发电等渠道](docs/sell-domestic.md) 购买后发放；开发者用 `node scripts/issue-license.js` 生成。
+
+## 下载与安装
+
+### 方式 A：GitHub Release（推荐）
+
+1. 打开 [Releases](https://github.com/clearview-tools/clearview-magnifier/releases) 下载最新 `clearview-magnifier-v*.zip`
+2. 解压到本地文件夹
+3. Chrome 打开 `chrome://extensions/` → 开启 **开发者模式**
+4. **加载已解压的扩展程序** → 选择解压后的文件夹
+5. 在普通 `https://` 网页上 **Alt + 右键** 启动放大镜
+
+更新：下载新 ZIP 覆盖原目录，在扩展管理页点击 **重新加载**。
+
+### 方式 B：克隆源码（开发者）
+
+```bash
+git clone https://github.com/clearview-tools/clearview-magnifier.git
+```
+
+然后在 `chrome://extensions/` 加载项目根目录。
+
+> 扩展无法在 `chrome://` 页面运行；安装或更新后请刷新网页（F5）。
+
+## 购买 Pro（国内）
+
+暂无上 Chrome 商店时，通过 **GitHub 安装免费版** + **国内平台购买 License**：
+
+| 步骤 | 说明 |
+|------|------|
+| 安装 | 见上方 Release 下载 |
+| 购买 | [爱发电 · clearview-tools](https://afdian.com/a/clearview-tools) |
+| 激活 | 扩展面板输入 `CVPRO-XXXX-XXXX-XXXX` |
+
+维护者发布新版本：`.\scripts\release-github.ps1`  
+每售出一单：`node scripts/issue-license.js --add --commit` 后 `git push`
 
 ## 功能特性
 
@@ -29,31 +66,16 @@ Pro 激活：扩展面板输入 License Key。测试可用 `CVPRO-DEV-0001-TEST`
 - **实用工具** — 链接预览、颜色拾取、双击复制原文 + 译文
 - **多种启动方式** — 鼠标组合键、快捷键、设置面板
 
-## 安装
+## 安装（旧文档合并见上方「下载与安装」）
 
-1. 克隆或下载本项目到本地
-2. 打开 Chrome，访问 `chrome://extensions/`
-3. 开启右上角「开发者模式」
-4. 点击「加载已解压的扩展程序」，选择 `clearview-magnifier` 文件夹
-5. 在普通网页（`http://` / `https://`）上即可使用
+图标位于 `icons/`（16 / 48 / 128 px）。
 
-图标位于 `icons/`（16 / 48 / 128 px），可直接用于打包上架。
-
-> **注意：** 扩展无法在 `chrome://` 等浏览器内部页面上运行；安装或更新扩展后，若功能异常，请刷新当前网页（F5）。
-
-### 隐私政策与品牌（Chrome 商店必填）
+### 隐私政策与品牌
 
 推荐 **GitHub 组织 + Pages** 做品牌开源：对外是 `组织名.github.io`，不暴露个人账号。  
 完整步骤见 **[docs/brand-open-source.md](docs/brand-open-source.md)**。
 
-部署 `docs/` 后，将 URL 写入 `background/site-config.js` 并填入 Chrome 商店。
-
-本地已初始化 Git 仓库。首次发布请在项目目录执行：
-
-```powershell
-gh auth login
-.\scripts\publish-github.ps1
-```
+部署 `docs/` 后，将 URL 写入 `background/site-config.js`。国内售卖见 **[docs/sell-domestic.md](docs/sell-domestic.md)**。
 
 ## 快速上手
 

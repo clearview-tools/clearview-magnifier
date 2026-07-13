@@ -31,6 +31,10 @@ async function applySiteLinks() {
       purchaseLink.href = site.purchaseUrl;
       purchaseLink.hidden = false;
     }
+    const freeHint = document.getElementById('freeHint');
+    if (freeHint && site?.purchaseUrl) {
+      freeHint.textContent = '购买 Pro 后在此输入 License 激活';
+    }
   } catch {
     /* 忽略 */
   }
