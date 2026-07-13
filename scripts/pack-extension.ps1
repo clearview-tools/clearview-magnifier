@@ -18,7 +18,8 @@ foreach ($item in $items) {
 }
 
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
-Compress-Archive -Path $stageDir -DestinationPath $zipPath -Force
+# 直接压缩 stage 目录内的文件，避免解压后多一层文件夹导致 Chrome 找不到 manifest.json
+Compress-Archive -Path (Join-Path $stageDir '*') -DestinationPath $zipPath -Force
 
 $forbidden = @('CVPRO-DEV', 'DEV-0001-TEST', '测试密钥')
 $zipEntries = (Get-Content $zipPath -Encoding Byte -ReadCount 0)

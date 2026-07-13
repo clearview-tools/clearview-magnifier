@@ -29,9 +29,10 @@ Pro 激活：扩展面板输入 License Key，**自激活日起有效期 1 年**
 
 1. 打开 [Releases](https://github.com/clearview-tools/clearview-magnifier/releases) 下载 **`clearview-magnifier-v*.zip`**（不要下载 Source code）
 2. 解压到本地文件夹
-3. Chrome 打开 `chrome://extensions/` → 开启 **开发者模式**
-4. **加载已解压的扩展程序** → 选择解压后的文件夹
-5. 在普通 `https://` 网页上 **Alt + 右键** 启动放大镜
+3. **加载时选中的文件夹里必须直接能看到 `manifest.json`**（若解压后还有一层 `clearview-magnifier` 子目录，请进入该子目录再选）
+4. Chrome 打开 `chrome://extensions/` → 开启 **开发者模式**
+5. **加载已解压的扩展程序** → 选择上述文件夹
+6. 在普通 `https://` 网页上 **Alt + 右键** 启动放大镜
 
 更新：下载新 ZIP 覆盖原目录，在扩展管理页点击 **重新加载**。
 
@@ -39,9 +40,11 @@ Pro 激活：扩展面板输入 License Key，**自激活日起有效期 1 年**
 
 ```bash
 git clone https://github.com/clearview-tools/clearview-magnifier.git
+cd clearview-magnifier
+.\scripts\pack-extension.ps1
 ```
 
-然后在 `chrome://extensions/` 加载项目根目录。
+然后在 `chrome://extensions/` 加载 **`dist\clearview-magnifier`**（不要直接选项目根目录；根目录若含 `_` 开头的文件夹会导致 Chrome 拒绝加载）。
 
 > 扩展无法在 `chrome://` 页面运行；安装或更新后请刷新网页（F5）。
 
