@@ -2,13 +2,13 @@
 
 [中文 README](README.md)
 
-A Chrome extension with a local screen magnifier, optional live translation, and reading aids to make web content easier to read.
+A browser extension with a local screen magnifier, optional live translation, and reading aids to make web content easier to read.
 
-**Current version:** 1.1.3
+**Current version:** 1.1.4
 
 - **Repository:** [github.com/clearview-tools/clearview-magnifier](https://github.com/clearview-tools/clearview-magnifier)
 - **Releases:** [Download ZIP](https://github.com/clearview-tools/clearview-magnifier/releases)
-- **Privacy policy:** [clearview-tools.github.io/clearview-magnifier/privacy.html](https://clearview-tools.github.io/clearview-magnifier/privacy.html)
+- **Privacy policy:** [Privacy page](https://clearview-tools.github.io/clearview-magnifier/privacy.html)
 - **Feedback:** [GitHub Issues](https://github.com/clearview-tools/clearview-magnifier/issues)
 
 ## Free vs Pro
@@ -19,49 +19,57 @@ A Chrome extension with a local screen magnifier, optional live translation, and
 | Reading line, crosshair, invert / contrast | Yes | Yes |
 | Color picker, link preview | Yes | Yes |
 | Live translation | No | Yes |
-| Priority translation APIs | No | Yes |
+| Priority translation channels | No | Yes |
 | Translation quota | — | 500 / day |
 | Settings storage | Local | Chrome sync |
 
-**Pro activation:** Enter a License Key in the extension popup. **Valid for 1 year from activation** (reverts to free when expired; purchase a new key to renew). Keys are issued after purchase via [Afdian](https://afdian.com/a/clearview-tools) (or contact us on GitHub Issues for international users). Maintainers generate keys with `node scripts/issue-license.js`.
+**Pro activation:** Enter a License Key in the extension popup. **Valid for 1 year from activation** (reverts to free when expired; renew with a new key). Keys are issued after purchase via [Afdian](https://afdian.com/a/clearview-magnifier) (or contact us on [GitHub Issues](https://github.com/clearview-tools/clearview-magnifier/issues) for international inquiries).
 
 ## Download & install
 
 > Not on the Chrome Web Store yet — install via **Load unpacked** (Developer mode).
 
-### Option A: GitHub Release (recommended)
+### Chrome / Edge (recommended)
 
 1. Download **`clearview-magnifier-v*.zip`** from [Releases](https://github.com/clearview-tools/clearview-magnifier/releases) — **not** “Source code”
-2. Unzip to a folder on your computer
-3. Open `chrome://extensions/` in Chrome
-4. Enable **Developer mode** (top right)
-5. Click **Load unpacked** and select the unzipped folder
-6. On any `https://` page, press **Alt + Right-click** to start the magnifier
+2. Unzip the folder; it must **directly contain `manifest.json`**
+3. Open `chrome://extensions/` (Edge: `edge://extensions/`) → enable **Developer mode**
+4. Click **Load unpacked** and select that folder
+5. On any `https://` page, press **Alt + Right-click** to start the magnifier
 
-**Updates:** Download the new ZIP, replace the folder, then click **Reload** on the extension card in `chrome://extensions/`.
+**Updates:** Download the new ZIP, replace the folder, click **Reload** on the extension card, then refresh the page (F5).
 
-### Option B: Clone source (developers)
+> The extension does not run on built-in browser pages such as `chrome://`.
 
-```bash
-git clone https://github.com/clearview-tools/clearview-magnifier.git
-```
+### 360 Browser (Secure / Speed)
 
-Load the project root directory in `chrome://extensions/`.
+360 browsers can load the extension in Developer mode. The popup includes **browser compatibility patches** with automatic detection:
 
-> The extension does not run on `chrome://` pages. After install or update, refresh the current tab (F5).
+| Browser | Extensions page | Recommended patch |
+|---------|-----------------|-------------------|
+| **360 Speed** | `chrome://extensions/` | 360 Speed patch |
+| **360 Secure** | `se://extensions/` | 360 Secure patch |
+
+1. Unzip the [Release ZIP](https://github.com/clearview-tools/clearview-magnifier/releases) (folder must contain `manifest.json` at the top level)
+2. Use **Chromium / Speed mode** (lightning icon), not IE compatibility mode
+3. Load unpacked from the extensions page above
+4. Open the ClearView popup → **Browser compatibility** → keep **Auto** or apply the recommended patch
+5. Refresh any `https://` tab (F5), then **Alt + Right-click**
 
 ## Buy Pro
 
 | Step | Action |
 |------|--------|
-| Install | See Release download above |
-| Purchase | [Afdian · clearview-tools](https://afdian.com/a/clearview-tools) or [open an Issue](https://github.com/clearview-tools/clearview-magnifier/issues) |
+| Install | See download & install above |
+| Purchase | [Afdian · clearview-magnifier](https://afdian.com/a/clearview-magnifier) |
 | Activate | Enter `CVPRO-XXXX-XXXX-XXXX` in the extension popup |
+
+International users can also reach out via [GitHub Issues](https://github.com/clearview-tools/clearview-magnifier/issues).
 
 ## Features
 
-- **Screen magnifier** — Circular or rounded lens follows the cursor; zoom 1.5x–6x, lens size 120–400px
-- **Live translation (Pro)** — Translates text under the lens; multi-API fallback
+- **Screen magnifier** — Circular or rounded lens follows the cursor; adjustable zoom and lens size
+- **Live translation (Pro)** — Translates text under the lens
 - **Reading aids** — Reading line, crosshair, high contrast / invert
 - **Utilities** — Link preview, color picker, double-click to copy source + translation
 - **Multiple ways to start** — Mouse chords, keyboard shortcuts, popup settings
@@ -111,89 +119,36 @@ Load the project root directory in `chrome://extensions/`.
 Click the extension icon to open the popup:
 
 - **Languages** — Source (auto-detect supported) and target
-- **Magnifier** — Default zoom, lens size, shape; sliders apply live
+- **Magnifier** — Default zoom, lens size, shape
 - **Close on release** — If checked, magnifier closes when Alt+Right-click is released (default: stay on)
 - **Assistive options** — Reading line, crosshair, link preview, color picker, HUD, etc.
+- **Browser compatibility** — Recommended patches for 360 and similar environments
 
-Pro users: settings sync via `chrome.storage.sync` across Chrome profiles on the same Google account.
-
-Wheel / shortcut adjustments during a session are **temporary**; the next session uses popup defaults again.
-
-## Project structure
-
-```
-clearview-magnifier/
-├── manifest.json           # Manifest V3
-├── background/
-│   ├── service-worker.js   # Screenshots, translation, commands
-│   ├── license.js          # Pro license & quota
-│   └── site-config.js      # Public URLs (privacy, purchase, support)
-├── content/
-│   ├── magnifier.js        # Core magnifier logic
-│   └── magnifier.css
-├── popup/
-│   ├── popup.html
-│   ├── popup.css
-│   └── popup.js
-├── icons/
-└── docs/                   # GitHub Pages (privacy policy, etc.)
-```
-
-## Technical notes
-
-### Architecture
-
-- **Manifest V3** with a Service Worker background script
-- **Screenshots** — `chrome.tabs.captureVisibleTab`; rendered locally on Canvas
-- **No recursive zoom** — Overlay hidden before each capture so the lens is not captured inside itself
-- **Hot reload** — Re-injects content scripts after extension reload; refresh the page if you see “Extension context invalidated”
-
-### Translation (Pro)
-
-APIs are tried in order; on quota or failure, the next provider is used:
-
-| Priority | Provider | Notes |
-|----------|----------|-------|
-| 1 | MyMemory | Primary; 1h cooldown after free quota |
-| 2 | Google Translate | Fallback |
-| 3 | Lingva | Fallback |
-
-- 5-minute translation cache
-- Max 500 characters per request
-
-### Permissions
-
-- `activeTab`, `storage`, `scripting`
-- `<all_urls>` and translation API host permissions
+Pro users can sync settings across profiles on the same browser account. Wheel / shortcut adjustments during a session are temporary; the next session uses popup defaults again.
 
 ## Privacy
 
-- Translation sends only the text snippet under the lens to public third-party APIs
-- Screenshots are processed locally in Canvas and are not uploaded
-- Settings are stored locally or in Chrome sync (Pro)
+- Translation sends only the text snippet under the lens to public third-party services
+- Screenshots are processed locally and are not uploaded
+- Settings are stored locally or in browser sync (Pro)
+
+See the [privacy policy](https://clearview-tools.github.io/clearview-magnifier/privacy.html).
 
 ## FAQ
 
 **Lens not following / screenshot fails?**
-- Use on normal `http://` or `https://` pages, not `chrome://`
-- Reload the extension in `chrome://extensions/`, then refresh the page (F5)
-
-**Zoom keeps changing?**
-- Fixed in v1.0.3+: overlay hidden before capture prevents “nested zoom”
-- Scroll-wheel zoom only applies while the magnifier is active
+- Use on normal `http://` or `https://` pages, not built-in browser pages
+- Reload the extension, then refresh the page (F5)
 
 **Translation not working?**
-- Live translation requires **Pro** and “Enable translation” in settings
-- Public APIs have rate limits; the extension switches providers automatically
-- Retry later or disable translation temporarily
+- Requires **Pro** and “Enable translation” in settings
+- Public translation services have rate limits — retry later
+- On 360 Secure Browser, enable the “360 Secure” compatibility patch in the popup
 
-## License
+**360 browser issues?**
+- Popup → **Browser compatibility** → use the recommended patch or keep Auto
+- Must use Chromium / Speed mode
 
-TBD
-
-## Maintainer docs
-
-- [Brand & open source](docs/brand-open-source.md)
-- [Domestic sales (CN)](docs/sell-domestic.md)
-- Pack for release: `.\scripts\pack-extension.ps1`
-- Publish release: `.\scripts\release-github.ps1`
+**Cannot load after download?**
+- Download the Release **`.zip` package**, not Source code
+- Select the unzipped folder that **directly contains `manifest.json`**

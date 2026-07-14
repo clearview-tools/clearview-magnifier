@@ -1,6 +1,7 @@
-importScripts('site-config.js', 'license.js');
+importScripts('site-config.js', 'license.js', 'browser-compat.js');
 
 chrome.runtime.onInstalled.addListener(async () => {
+  await refreshCompatCache();
   await reinjectContentScripts();
 });
 
@@ -33,17 +34,24 @@ const CACHE_TTL = 5 * 60 * 1000;
 const translateCache = new Map();
 const providerCooldown = new Map();
 
-const PRO_PROVIDERS = [
+const PRO_PROVIDERS_BASE = [
   { name: 'mymemory', translate: translateMyMemory, cooldownOnFail: 60 * 60 * 1000 },
   { name: 'google', translate: translateGoogle, cooldownOnFail: 5 * 60 * 1000 },
   { name: 'lingva', translate: translateLingva, cooldownOnFail: 5 * 60 * 1000 }
 ];
 
-const FETCH_TIMEOUT_MS = 10000;
+function getFetchTimeoutMs() {
+  return getActiveCompatProfile().fetchTimeoutMs || 10000;
+}
+
+function getTranslateProviders() {
+  return orderTranslateProviders(PRO_PROVIDERS_BASE, getActiveCompatProfile());
+}
 
 async function fetchWithTimeout(url, options = {}) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  const timeoutMs = getFetchTimeoutMs();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     return await fetch(url, { ...options, signal: controller.signal });
   } finally {
@@ -90,6 +98,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     getSettingsStorageArea().then((area) => sendResponse({ area: area === chrome.storage.sync ? 'sync' : 'local' }));
     return true;
   }
+
+  if (message.type === 'get-compat-status') {
+    getCompatStatus(message.userAgent).then(sendResponse);
+    return true;
+  }
+
+  if (message.type === 'set-compat-patch') {
+    setCompatPatchId(message.patchId)
+      .then(async () => {
+        await refreshCompatCache();
+        sendResponse({ ok: true });
+      })
+      .catch((err) => sendResponse({ ok: false, error: err.message }));
+    return true;
+  }
 });
 
 async function handleCapture(tabId) {
@@ -97,12 +120,7 @@ async function handleCapture(tabId) {
     throw new Error('无法获取当前标签页');
   }
 
-  const dataUrl = await chrome.tabs.captureVisibleTab(null, {
-    format: 'png',
-    quality: 100
-  });
-
-  return { dataUrl };
+  return captureWithCompat(tabId);
 }
 
 async function handleTranslate(text, from, to, skipQuota) {
@@ -137,7 +155,7 @@ async function handleTranslate(text, from, to, skipQuota) {
 
   let lastError = null;
 
-  for (const provider of PRO_PROVIDERS) {
+  for (const provider of getTranslateProviders()) {
     if (!isProviderAvailable(provider.name)) continue;
 
     try {

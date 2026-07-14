@@ -146,6 +146,23 @@
     </ul>
   </section>
 
+  <section class="section" id="compatSection">
+    <h2>浏览器兼容</h2>
+    <p id="compatDetect" class="compat-detect">检测中…</p>
+    <div class="row">
+      <label for="compatPatch">兼容补丁</label>
+      <select id="compatPatch">
+        <option value="auto">自动（按检测结果推荐）</option>
+        <option value="none">标准（Chrome / Edge）</option>
+        <option value="360ee">360 极速浏览器补丁</option>
+        <option value="360se">360 安全浏览器补丁</option>
+      </select>
+    </div>
+    <button type="button" id="applyRecommendedPatch" class="btn-ghost compat-apply" hidden>应用推荐补丁</button>
+    <ul id="compatTips" class="compat-tips"></ul>
+    <a id="compatExtensionsLink" href="chrome://extensions/" class="compat-link" hidden>打开扩展管理页</a>
+  </section>
+
   <footer class="footer">ClearView Magnifier Extension</footer>
   <script src="popup.js"></script>
 </body>

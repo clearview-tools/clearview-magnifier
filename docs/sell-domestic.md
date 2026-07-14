@@ -138,7 +138,7 @@ node scripts/generate-license-key.js
 爱发电商品页创建后，编辑 `background/site-config.js`：
 
 ```javascript
-purchaseUrl: 'https://afdian.com/a/clearview-tools',
+purchaseUrl: 'https://afdian.com/a/clearview-magnifier',
 ```
 
 重新打包 Release，用户扩展面板会出现 **购买 / 咨询**。

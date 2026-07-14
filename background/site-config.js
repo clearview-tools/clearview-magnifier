@@ -7,7 +7,7 @@ const SITE_CONFIG = {
   privacyUrl: 'https://clearview-tools.github.io/clearview-magnifier/privacy.html',
 
   /** 购买 Pro / 咨询（爱发电） */
-  purchaseUrl: 'https://afdian.com/a/clearview-tools',
+  purchaseUrl: 'https://afdian.com/a/clearview-magnifier',
 
   /** 用户反馈：组织仓库 Issues */
   supportUrl: 'https://github.com/clearview-tools/clearview-magnifier/issues',

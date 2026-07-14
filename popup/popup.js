@@ -43,9 +43,11 @@ async function applySiteLinks() {
 document.addEventListener('DOMContentLoaded', async () => {
   await applySiteLinks();
   await refreshProUI();
+  await refreshCompatUI();
   await loadSettings();
   bindSettingsEvents();
   bindProEvents();
+  bindCompatEvents();
 });
 
 async function refreshProUI() {
@@ -120,6 +122,104 @@ function bindSettingsEvents() {
 function bindProEvents() {
   document.getElementById('activateLicense')?.addEventListener('click', activateLicense);
   document.getElementById('deactivateLicense')?.addEventListener('click', deactivateLicense);
+}
+
+async function refreshCompatUI() {
+  const status = await chrome.runtime.sendMessage({
+    type: 'get-compat-status',
+    userAgent: navigator.userAgent
+  });
+  if (!status) return;
+
+  const detectEl = document.getElementById('compatDetect');
+  const patchSelect = document.getElementById('compatPatch');
+  const tipsEl = document.getElementById('compatTips');
+  const applyBtn = document.getElementById('applyRecommendedPatch');
+  const extLink = document.getElementById('compatExtensionsLink');
+
+  const activeLabel = status.effective?.label || '标准';
+  const prefLabel = status.patchPreference === 'auto' ? '自动' : activeLabel;
+
+  if (detectEl) {
+    detectEl.textContent = `当前浏览器：${status.detectedLabel} · 补丁：${prefLabel}（生效：${activeLabel}）`;
+  }
+
+  if (patchSelect) {
+    patchSelect.value = status.patchPreference || 'auto';
+  }
+
+  if (tipsEl) {
+    tipsEl.innerHTML = '';
+    const tips = status.effective?.tips || [];
+    for (const tip of tips) {
+      const li = document.createElement('li');
+      li.textContent = tip;
+      tipsEl.appendChild(li);
+    }
+    if (!tips.length && status.detectedFamily === 'chrome') {
+      const li = document.createElement('li');
+      li.textContent = '未检测到 360 浏览器，使用标准模式即可。';
+      tipsEl.appendChild(li);
+    }
+  }
+
+  const needsRecommend = status.detectedFamily !== 'chrome'
+    && status.effectivePatchId !== status.recommendedPatchId;
+  if (applyBtn) {
+    applyBtn.hidden = !needsRecommend;
+    if (needsRecommend) {
+      const name = status.recommendedPatchId === '360se'
+        ? '360 安全浏览器'
+        : status.recommendedPatchId === '360ee'
+          ? '360 极速浏览器'
+          : '标准';
+      applyBtn.textContent = `应用推荐：${name}补丁`;
+    }
+  }
+
+  if (extLink && status.effective?.extensionsPageUrl) {
+    extLink.href = status.effective.extensionsPageUrl;
+    extLink.hidden = status.detectedFamily === 'chrome';
+    extLink.textContent = status.detectedFamily === '360se'
+      ? '打开 se://extensions/'
+      : '打开 chrome://extensions/';
+  }
+}
+
+function bindCompatEvents() {
+  const patchSelect = document.getElementById('compatPatch');
+  const applyBtn = document.getElementById('applyRecommendedPatch');
+
+  patchSelect?.addEventListener('change', async () => {
+    await chrome.runtime.sendMessage({
+      type: 'set-compat-patch',
+      patchId: patchSelect.value
+    });
+    await refreshCompatUI();
+    notifyTabsCompatUpdated();
+  });
+
+  applyBtn?.addEventListener('click', async () => {
+    const status = await chrome.runtime.sendMessage({
+      type: 'get-compat-status',
+      userAgent: navigator.userAgent
+    });
+    const patchId = status?.recommendedPatchId || 'none';
+    const patchSelect = document.getElementById('compatPatch');
+    if (patchSelect) patchSelect.value = patchId;
+    await chrome.runtime.sendMessage({ type: 'set-compat-patch', patchId });
+    await refreshCompatUI();
+    notifyTabsCompatUpdated();
+  });
+}
+
+async function notifyTabsCompatUpdated() {
+  const tabs = await chrome.tabs.query({});
+  for (const tab of tabs) {
+    if (tab.id) {
+      chrome.tabs.sendMessage(tab.id, { type: 'compat-updated' }).catch(() => {});
+    }
+  }
 }
 
 function updateLabels(data) {

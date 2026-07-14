@@ -44,7 +44,43 @@ if ($LASTEXITCODE -ne 0) {
 
 if (-not $Notes) {
     $nl = [Environment]::NewLine
-    $Notes = "## ClearView Magnifier $tag${nl}${nl}- Download $zipName and load unpacked in chrome://extensions/${nl}- Free: magnifier and reading aids${nl}- Pro: activate License in extension popup"
+    $Notes = @"
+## ClearView Magnifier $tag
+
+---
+
+### 中文
+
+**安装**
+1. 下载 **``$zipName``**（不要下载 Source code）
+2. 解压后选中**直接包含 ``manifest.json`` 的文件夹**
+3. 打开 ``chrome://extensions/`` → 开启**开发者模式** → **加载已解压的扩展程序**
+4. 在任意 ``https://`` 网页按 **F5** 刷新，**Alt + 右键** 启动放大镜
+
+**免费版 vs Pro**
+- 免费版：放大镜、阅读线、十字准星、反色、颜色拾取、链接预览
+- Pro：实时翻译、优先 API、每日 500 次额度、设置 Chrome 云同步
+
+购买 Pro：[爱发电 · clearview-magnifier](https://afdian.com/a/clearview-magnifier)  
+问题反馈：[GitHub Issues](https://github.com/clearview-tools/clearview-magnifier/issues)
+
+---
+
+### English
+
+**Install**
+1. Download **``$zipName``** (not "Source code")
+2. Select the folder that **directly contains ``manifest.json``** after unzip
+3. Open ``chrome://extensions/`` → enable **Developer mode** → **Load unpacked**
+4. On any ``https://`` page, press **F5**, then **Alt + Right-click** to start the magnifier
+
+**Free vs Pro**
+- Free: magnifier, reading line, crosshair, invert/contrast, color picker, link preview
+- Pro: live translation, priority APIs, 500 translations/day, Chrome settings sync
+
+Buy Pro: [Afdian · clearview-magnifier](https://afdian.com/a/clearview-magnifier)  
+Feedback: [GitHub Issues](https://github.com/clearview-tools/clearview-magnifier/issues)
+"@
 }
 
 $ghArgs = @(

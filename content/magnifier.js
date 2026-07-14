@@ -582,7 +582,7 @@
     } catch (err) {
       if (handleIfInvalidated(err)) return;
       console.warn('[ClearView] 截图失败:', err);
-      showToast('截图失败，请刷新页面后重试');
+      showToast('截图失败：请在扩展面板启用对应浏览器兼容补丁，或 F5 刷新后重试');
     } finally {
       if (root) root.style.visibility = prevVisibility;
       state.captureInProgress = false;
