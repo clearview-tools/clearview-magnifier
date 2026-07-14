@@ -21,7 +21,7 @@
 | 翻译额度 | — | 500 次/天 |
 | 设置云同步 | 本地存储 | Chrome 同步 |
 
-Pro 激活：扩展面板输入 License Key。正式密钥通过 [爱发电等渠道](docs/sell-domestic.md) 购买后发放；开发者用 `node scripts/issue-license.js` 生成。
+Pro 激活：扩展面板输入 License Key。正式密钥通过 [爱发电等渠道](https://afdian.com/a/clearview-magnifier) 购买后发放；开发者用 `node scripts/issue-license.js` 生成。
 
 ## 下载与安装
 
