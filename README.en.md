@@ -23,7 +23,7 @@ A Chrome extension with a local screen magnifier, optional live translation, and
 | Translation quota | — | 500 / day |
 | Settings storage | Local | Chrome sync |
 
-**Pro activation:** Enter a License Key in the extension popup. Keys are issued after purchase via [Afdian](https://afdian.com/a/clearview-tools) (or contact us on GitHub Issues for international users). Maintainers generate keys with `node scripts/issue-license.js`.
+**Pro activation:** Enter a License Key in the extension popup. Keys are issued after purchase via [Afdian](https://afdian.com/a/clearview-magnifier) (or contact us on GitHub Issues for international users). Maintainers generate keys with `node scripts/issue-license.js`.
 
 ## Download & install
 
